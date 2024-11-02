@@ -1,0 +1,333 @@
+---
+title: "School Accreditation Work: Late October Updates"
+author: "Elise Fashimpaur"
+date: "2024-10-22"
+output: html_document
+---
+
+## Packages Set-Up 
+Need to include all the merged CSV's. 
+```{r setup, include=FALSE}
+#install.packages("dplyr")
+#install.packages("readr")
+#install.packages("tidyverse")
+
+library(dplyr)
+library(readr)
+library(tidyverse)
+```
+
+
+## CSV's to read in
+
+This will need to be edited depending on the file path on the particular computer this is being read-in on.
+
+**CollegeComparators** is the csv file with information on the unit id of that branch of school, College Name and the type of comparison that is being made with the neutral reference being ourselves (Willamette).
+
+**VariableComparators** is the csv file with information on the variable name written in the document and the kind of information that is tells us (e.g. financial, diversity). 
+
+### Reading in Merged Paths
+
+You will only need to touch the *path_...* ones to match your computer's path for these merged files downloaded from College Scorecard.
+
+```{r setup, include=FALSE}
+path_9697 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED1996_97_PP.csv"
+path_9798 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED1997_98_PP.csv"
+path_9899 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED1998_99_PP.csv"
+path_9900 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED1999_00_PP.csv"
+path_0001 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2000_01_PP.csv"
+path_0102 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2001_02_PP.csv"
+path_0203 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2002_03_PP.csv"
+path_0304 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2003_04_PP.csv"
+path_0405 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2004_05_PP.csv"
+path_0506 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2005_06_PP.csv"
+path_0607 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2006_07_PP.csv"
+path_0708 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2007_08_PP.csv"
+path_0809 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2008_09_PP.csv"
+path_0910 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2009_10_PP.csv"
+path_1011 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2010_11_PP.csv"
+path_1112 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2011_12_PP.csv"
+path_1213 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2012_13_PP.csv"
+path_1314 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2013_14_PP.csv"
+path_1415 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2014_15_PP.csv"
+path_1516 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2015_16_PP.csv"
+path_1617 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2016_17_PP.csv"
+path_1718 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2017_18_PP.csv"
+path_1819 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2018_19_PP.csv"
+path_1920 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2019_20_PP.csv"
+path_2021 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2020_21_PP.csv"
+path_2122 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2021_22_PP.csv"
+path_2223 <- "/Users/Owner/Downloads/College_Scorecard_Raw_Data_06102024/MERGED2022_23_PP.csv"
+
+# Now including each one as a year
+
+y9697 <- read_csv(path_9697)
+year_9697 <- y9697 %>% add_column(year="1996-97")
+y9798 <- read_csv(path_9798)
+year_9798 <- y9798 %>% add_column(year="1997-98")
+y9899 <- read_csv(path_9899)
+year_9899 <- y9899 %>% add_column(year="1998-99")
+y9900 <- read_csv(path_9900)
+year_9900 <- y9900 %>% add_column(year="1999-00")
+y0001 <- read_csv(path_0001)
+year_0001 <- y0001 %>% add_column(year="2000-01")
+y0102 <- read_csv(path_0102)
+year_0102 <- y0102 %>% add_column(year="2001-02")
+y0203 <- read_csv(path_0203)
+year_0203 <- y0203 %>% add_column(year="2002-03")
+y0304 <- read_csv(path_0304)
+year_0304 <- y0304 %>% add_column(year="2003-04")
+y0405 <- read_csv(path_0405)
+year_0405 <- y0405 %>% add_column(year="2004-05")
+y0506 <- read_csv(path_0506)
+year_0506 <- y0506 %>% add_column(year="2005-06")
+y0607 <- read_csv(path_0607)
+year_0607 <- y0607 %>% add_column(year="2006-07")
+y0708 <- read_csv(path_0708)
+year_0708 <- y0708 %>% add_column(year="2007-08")
+y0809 <- read_csv(path_0809)
+year_0809 <- y0809 %>% add_column(year="2008-09")
+y0910 <- read_csv(path_0910)
+year_0910 <- y0910 %>% add_column(year="2009-10")
+y1011 <- read_csv(path_1011)
+year_1011 <- y1011 %>% add_column(year="2010-11")
+y1112 <- read_csv(path_1112)
+year_1112 <- y1112 %>% add_column(year="2011-12")
+y1213 <- read_csv(path_1213)
+year_1213 <- y1213 %>% add_column(year="2012-13")
+y1314 <- read_csv(path_1314)
+year_1314 <- y1314 %>% add_column(year="2013-14")
+y1415 <- read_csv(path_1415)
+year_1415 <- y1415 %>% add_column(year="2014-15")
+y1516 <- read_csv(path_1516)
+year_1516 <- y1516 %>% add_column(year="2015-16")
+y1617 <- read_csv(path_1617)
+year_1617 <- y1617 %>% add_column(year="2016-17")
+y1718 <- read_csv(path_1718)
+year_1718 <- y1718 %>% add_column(year="2017-18")
+y1819 <- read_csv(path_1819)
+year_1819 <- y1819 %>% add_column(year="2018-19")
+y1920 <- read_csv(path_1920)
+year_1920 <- y1920 %>% add_column(year="2019-20")
+y2021 <- read_csv(path_2021)
+year_2021 <- y2021 %>% add_column(year="2020-21")
+y2122 <- read_csv(path_2122)
+year_2122 <- y2122 %>% add_column(year="2021-22")
+y2223 <- read_csv(path_2223)
+year_2223 <- y2223 %>% add_column(year="2022-23")
+
+```
+
+### Reading in Variable Files
+
+When editing, only touch the *path_...* name to the correct path on your computer. Everything else will line up afterward.
+
+```{r}
+path_collegecomparators <- "/Users/Owner/Documents/CollegeComparators.csv"
+path_variablecomparators <- "/Users/Owner/Documents/VariableComparators.csv"
+
+college_comparators <- read_csv(path_collegecomparators)
+variable_comparators <- read_csv(path_variablecomparators)
+```
+
+### Reading in Specific Variables from Years
+
+This first one is an example to show proof of concept...
+
+```{r}
+filtered_2223 <- year_2223%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+
+```
+
+Now the rest are all the others...
+
+```{r}
+# 2021-22
+filtered_2122 <- year_2122%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2020-21
+filtered_2021 <- year_2021%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2019-20
+filtered_1920 <- year_1920%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2018-19
+filtered_1819 <- year_1819%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2017-18
+filtered_1718 <- year_1718%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2016-17
+filtered_1617 <- year_1617%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2015-16
+filtered_1516 <- year_1516%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2014-15
+filtered_1415 <- year_1415%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2013-14
+filtered_1314 <- year_1314%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2012-13
+filtered_1213 <- year_1213%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2011-12
+filtered_1112 <- year_1112%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2010-11
+filtered_1011 <- year_1011%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2009-10
+filtered_0910 <- year_0910%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2008-09
+filtered_0809 <- year_0809%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2007-08
+filtered_0708 <- year_0708%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2006-07
+filtered_0607 <- year_0607%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2005-06
+filtered_0506 <- year_0506%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2004-05
+filtered_0405 <- year_0405%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2003-04
+filtered_0304 <- year_0304%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2002-03
+filtered_0203 <- year_0203%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2001-02
+filtered_0102 <- year_0102%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 2000-01
+filtered_0001 <- year_0001%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 1999-00
+filtered_9900 <- year_9900%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 1998-99
+filtered_9899 <- year_9899%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 1997-98
+filtered_9798 <- year_9798%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+# 1996-97
+filtered_9697 <- year_9697%>%
+  filter(UNITID %in% college_comparators$UNITID)%>%
+  subset(select=(variable_comparators$Column_Name))%>%
+  left_join(college_comparators, by = "UNITID")
+```
+
+## Merging Files
+
+* **nrow(y1516)** had the result of *7666*, which is the most between 2015 and 2023.
+* **nrow(y2223)** had the result of *6484*, which is the least between 2015 and 2023.
+
+## Tidyverse Reduce Version
+
+Using the *rbind()* feature, we create a single, complete table with **all** information for every year, with the differentiating factor being the *year* column telling us which year the information is for relating to the school variable.
+
+This will NOT be the final version used for calculations, but is instead an intermediary version if you would like to play with the entire data set (although it's quite large to run).
+
+```{r}
+partialdf_reduce <- filtered_9697 %>%
+  rbind(filtered_9798) %>%
+  rbind(filtered_9899) %>%
+  rbind(filtered_9900) %>%
+  rbind(filtered_0001) %>%
+  rbind(filtered_0102) %>%
+  rbind(filtered_0203) %>%
+  rbind(filtered_0304) %>%
+  rbind(filtered_0405) %>%
+  rbind(filtered_0506) %>%
+  rbind(filtered_0607)
+```
+
+```{r}
+fulldf_reduce <- partialdf_reduce %>%
+  rbind(filtered_0708) %>%
+  rbind(filtered_0809) %>%
+  rbind(filtered_0910) %>%
+  rbind(filtered_1011) %>%
+  rbind(filtered_1112) %>%
+  rbind(filtered_1213) %>%
+  rbind(filtered_1314) %>%
+  rbind(filtered_1415) %>%
+  rbind(filtered_1516) %>%
+  rbind(filtered_1617) %>%
+  rbind(filtered_1718) %>%
+  rbind(filtered_1819) %>%
+  rbind(filtered_1920) %>%
+  rbind(filtered_2021) %>%
+  rbind(filtered_2122) %>%
+  rbind(filtered_2223)
+
+```
+
+# To CSV!
+
+CSV written out to desktop 
+
+```{r}
+write.csv(fulldf_reduce,'/Users/Owner/Documents/filtered_schools_10-22-24.csv', row.names = FALSE)
+```
+

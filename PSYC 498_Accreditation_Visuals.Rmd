@@ -1,0 +1,341 @@
+---
+title: "School Accreditation Work - Post Jamovi"
+author: "Elise Fashimpaur"
+date: "2024-10-22"
+output: html_document
+---
+
+## Packages Set-Up 
+Need to include all the merged CSV's. 
+```{r setup, include=FALSE}
+#install.packages("dplyr")
+#install.packages("readr")
+#install.packages("tidyverse")
+#install.packages("ggplot2")
+
+library(dplyr)
+library(readr)
+library(tidyverse)
+library(ggplot2)
+```
+
+## CSV's to read in
+
+```{r}
+filtered_path <- "/Users/Owner/Documents/filtered_schools_Nov_Edition.csv"
+jamovi_filtered <- read_csv(filtered_path)
+```
+
+```{r}
+regional_comparators <- c("Regional_Peer", "Regional_Competitor", "Willamette")
+national_comparators <- c("National_Peer", "Willamette")
+all_comparators <- c("Regional_Peer", "Regional_Competitor", "National_Peer", "Willamette")
+
+comparator_colors <- c("chocolate4","grey20","grey","red")
+```
+
+## Visualizations and Tables
+
+### Creating a Table
+
+*Unfinished...*
+
+```{r}
+table_for_blank <- data.table(column=c("type1", "type2"))
+```
+
+### PCTPELL and C100_4
+
+```{r}
+pell_completion_all <- jamovi_filtered %>%
+  ggplot(aes(x=PCTPELL_DCS*100,y=C100_4))+
+  geom_jitter(alpha=0.8)+
+  labs(title=element_text("4-Year Completion Rate Based on Pell Composition"),x="Percentage of Students Receiving Pell", y="Completion Rate in 4 Years")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()
+pell_completion_all
+
+pell_completion_all_linear <- jamovi_filtered %>%
+  ggplot(aes(x=PCTPELL_DCS*100,y=C100_4))+
+  geom_jitter(alpha=0.8)+
+  labs(title=element_text("4-Year Completion Rate Based on Pell Composition"),x="Percentage of Students Receiving Pell", y="Completion Rate in 4 Years")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(method="lm",se=FALSE)+
+  theme_light()
+pell_completion_all_linear
+
+pell_completion_grouped <- subset(jamovi_filtered, Comparator_Type %in% all_comparators) %>%
+  ggplot(aes(x=PCTPELL_DCS*100,y=C100_4,color=Comparator_Type))+
+  geom_jitter(alpha=0.8)+
+  labs(title=element_text("4-Year Completion Rate Based on Pell Composition (2022-2023)"),x="Percentage of Students Receiving Pell", y="Completion Rate in 4 Years")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(method="lm",se=FALSE)+
+  theme_light()
+pell_completion_grouped
+```
+
+### C100_4 Over Time
+
+```{r}
+completion_regional <- ggplot(subset(jamovi_filtered, Comparator_Type %in% regional_comparators), aes(x=year_num, y=C100_4, color=INSTNM))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("4-Year Completion Rate by Year for Regional Comparators"),x="Year (2000 to 2023)", y="Completion Rate in 4 Years")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(method="lm",se=FALSE)+
+  xlim(2000,2023)+
+  theme_light()
+  
+completion_regional
+
+completion_national <- ggplot(subset(jamovi_filtered, Comparator_Type %in% national_comparators), aes(x=year_num, y=C100_4, color=INSTNM))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("4-Year Completion Rate by Year for National Comparators"),x="Year (2000 to 2023)", y="Completion Rate in 4 Years")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(method="lm",se=FALSE)+
+  xlim(2000,2023)+
+  theme_light()
+  
+completion_national
+
+completion_all_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=C100_4, color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("4-Year Completion Rate by Year"),x="Year (2003 to 2023)", y="Completion Rate (in 4 Years)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2003,2023)
+
+completion_all_comparison
+```
+
+### Grad_Debt_Mdn Over Time
+
+```{r}
+grad_debt_mdn_plot <- ggplot(data = subset(jamovi_filtered, INSTNM %in% "Willamette University"), aes(x=year_num,y=GRAD_DEBT_MDN))+
+  geom_point()+
+  labs(title=element_text("Graduate Debt by Year for Willamette University"),x="Year (1996 to 2023)", y="Graduate Debt")+
+  theme(plot.title=element_text(hjust=0.5))+
+  theme_light()
+grad_debt_mdn_plot
+
+grad_debt_comparison_tuition <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=GRAD_DEBT_MDN, color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Graduate Debt by Year"),x="Year (1996 to 2023)", y="Graduate Debt (in US Dollars, Not Accounting for Inflation)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  geom_line(aes(y=COSTT4_A,color=Comparator_Type)) #Annual Tuition Cost
+
+grad_debt_comparison_tuition
+
+grad_debt_comparison_full <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=GRAD_DEBT_MDN, color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Graduate Debt by Year"),x="Year (1996 to 2023)", y="Graduate Debt (in US Dollars, Not Accounting for Inflation)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))
+
+grad_debt_comparison_full
+
+grad_debt_comparison_2005 <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=GRAD_DEBT_MDN, color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Graduate Debt by Year"),x="Year (2005 to 2023)", y="Graduate Debt (in US Dollars, Not Accounting for Inflation)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2005,2023)
+
+grad_debt_comparison_2005
+```
+
+### Diversity Percentages Over Time
+
+```{r}
+women_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=(UGDS_WOMEN*100), color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Female Enrollment Across Time"),x="Year (1996 to 2023)", y="Percentage of Women in Enrollment Composition")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))
+
+women_comparison
+```
+
+```{r}
+black_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=(UGDS_BLACK*100), color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Black Student Enrollment Across Time"),x="Year (2008 to 2023)", y="Percentage of Blacks in Enrollment Composition")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2008,2023)
+
+black_comparison
+```
+
+```{r}
+hispanic_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=(UGDS_HISP*100), color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Hispanic Student Enrollment Across Time"),x="Year (2008 to 2023)", y="Percentage of Hispanics in Enrollment Composition")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2008,2023)
+
+hispanic_comparison
+```
+
+
+```{r}
+asian_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=(UGDS_ASIAN*100), color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Asian Student Enrollment Across Time"),x="Year (2008 to 2023)", y="Percentage of Asians in Enrollment Composition")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2008,2023)
+
+asian_comparison
+```
+
+
+```{r}
+pell_comparison <- jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=(FTFTPCTPELL*100), color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("First-Year Students Receiving Pell Across Time"),x="Year (2008 to 2023)", y="Percentage of Pell Recipients in Enrollment Composition")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  scale_linetype_manual(values=c("dashed","dashed","dotdash","solid"))+
+  xlim(2008,2023)
+
+pell_comparison
+```
+
+#### Facet Wrap
+
+```{r}
+grad_debt_mdn_scatter <- ggplot(jamovi_filtered, aes(x=GRAD_DEBT_MDN, y=COMP_ORIG_YR4_RT, color=Comparator_Type))+
+  geom_point(alpha=0.7)+
+  facet_wrap(~year)+
+  geom_smooth(method="lm", se = FALSE)
+  
+grad_debt_mdn_scatter
+```
+
+### Retention Over Time
+
+```{r}
+
+retention_regional <- ggplot(subset(jamovi_filtered, Comparator_Type %in% regional_comparators), aes(x=year_num, y=RET_FT4, color=INSTNM))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Retention Rate by Year for Regional Comparators"),x="Year (2000 to 2023)", y="Retention Rate (First-Time Students, in 4 Years)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  xlim(2003,2023)
+  
+retention_regional
+
+retention_national <- ggplot(subset(jamovi_filtered, Comparator_Type %in% national_comparators), aes(x=year_num, y=RET_FT4, color=INSTNM))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Retention Rate by Year for National Comparators"),x="Year (2000 to 2023)", y="Retention Rate (First-Time Students, in 4 Years)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(,se=FALSE)+
+  theme_light()+
+  xlim(2003,2023)
+  
+retention_national
+
+jamovi_filtered%>%
+  filter(Comparator_Type %in% all_comparators)%>%
+  ggplot(aes(x=year_num, y=RET_FT4, color=Comparator_Type, alpha=0.6))+
+  geom_jitter(alpha=0.65)+
+  labs(title=element_text("Retention Rate by Year"),x="Year (2000 to 2023)", y="Retention Rate (First-Time Students in 4 Years)")+
+  theme(plot.title=element_text(hjust=0.5))+
+  geom_smooth(se=FALSE)+
+  theme_light()+
+  scale_color_manual(values=comparator_colors)+
+  xlim(2003,2023)
+
+```
+
+
+```{r}
+grad_debt_mdn_line <- ggplot(data=jamovi_filtered)+
+  geom_line(aes(x=year_num,y=GRAD_DEBT_MDN))
+
+grad_debt_mdn_line
+```
+
+### Linear Model for Graduate Debt + Residual Plot
+
+```{r}
+grad_debt_mdn_model <- lm(formula=COMP_ORIG_YR4_RT~GRAD_DEBT_MDN, data=jamovi_filtered)
+summary(grad_debt_mdn_model)
+
+s <- sqrt(sum(grad_debt_mdn_model$residuals^2)/174) #not sure what the 174 (originally 998)
+s
+```
+
+```{r}
+grad_debt_mdn_residual <- ggplot(jamovi_filtered, aes(x=GRAD_DEBT_MDN,y=grad_debt_mdn_model$residuals, alpha = 0.2))+
+  geom_point()+
+  geom_hline(yintercept=0, lty=2, lwd=1, color="blue")
+
+grad_debt_mdn_residual # error?
+
+qqnorm(grad_debt_mdn_model$residuals)
+qqline(grad_debt_mdn_model$residuals)
+```
+
+### Histogram for Graduate Debt
+
+- And completion rate for Pell...
+- And retention rate for Pell...
+
+```{r}
+grad_debt_mdn_bar <- ggplot(data=jamovi_filtered)+
+  geom_col(aes(x=as.numeric(COMP_ORIG_YR4_RT),y=as.numeric(GRAD_DEBT_MDN),fill="pos"))+
+  facet_wrap(~year, scales="free_y")+
+  labs(title="Title Here", subtitle="Subtitle Here", caption="Caption Here")+
+  theme(legend.position="none",plot.title=element_text(face="bold",hjust=0.5),plot.caption=element_text(color="gray",size=5),plot.subtitle=element_text(hjust=0.5,size=8))
+grad_debt_mdn_bar
+```
+
